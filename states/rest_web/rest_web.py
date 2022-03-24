@@ -1,4 +1,4 @@
-#Restful interface that has search and update options for navigating a Zip code database on Phpmyadmin.
+Restful interface that has search and update options for navigating a Zip code database on Phpmyadmin.
 
 
 #https://stackoverflow.com/questions/8211128/multiple-distinct-pages-in-one-html-file
@@ -16,50 +16,50 @@ app = Flask(__name__, static_url_path='')
 #connect to database
 conn = mysql.connector.connect(user='root', password='',
                                   host='127.0.0.1',
-                                  database='states',
+                                  database='zipcodes',
                                buffered = True)
 cursor = conn.cursor()
 
-#Search state database
-@app.route('/searchSTATE/<searchState>')
-def searchstate(searchState):
+#Search zipcode database
+@app.route('/searchZipcodes/<searchZipcode>')
+def searchstate(searchZipcode):
     # Get data from database
-    cursor.execute("SELECT * FROM `states` WHERE State=%s", [searchState])
+    cursor.execute("SELECT * FROM `zipcodes` WHERE Zipcode=%s", [searchZipcode])
     test = cursor.rowcount
     if test != 1:
-        return searchState + " was not found"
+        return searchZipcode + " was not found"
     else:
         searched = cursor.fetchall()
         return 'Success! Here you go: %s' % searched
 
-#update state database population for a specified state
-@app.route('/updatestatepop/<updateSTATE> <updatePOP>')
-def updatestatepop(updateSTATE, updatePOP):
-    cursor.execute("SELECT * FROM `states` WHERE State=%s", [updateSTATE])
+#update zipcode database population for a specified zipcode
+@app.route('/updatezipcodepop/<updateZIPCODE> <updatePOP>')
+def updatezipcodepop(updateZIPCODE, updatePOP):
+    cursor.execute("SELECT * FROM `zipcodes` WHERE Zipcode=%s", [updateZIPCODE])
     test = cursor.rowcount
     if test != 1:
-        return updateSTATE + " was not found"
+        return updateZIPCODE + " was not found"
     else:
-        cursor.execute("UPDATE `states` SET Pop = %s WHERE State= %s;", [updatePOP,updateSTATE])
-        cursor.execute("SELECT * FROM `states` WHERE State=%s and Pop=%s", [updateSTATE,updatePOP])
+        cursor.execute("UPDATE `zipcodes` SET Pop = %s WHERE Zipcode= %s;", [updatePOP,updateZIPCODE])
+        cursor.execute("SELECT * FROM `zipcodes` WHERE Zipcode=%s and Pop=%s", [updateZIPCODE,updatePOP])
         test1 = cursor.rowcount
         if test1 != 1:
-            return updateSTATE + "  failed to update"
+            return updateZIPCODE + "  failed to update"
         else:
-            return 'Population has been updated successfully for State: %s' % updateSTATE
+            return 'Population has been updated successfully for Zipcode: %s' % updateZIPCODE
 
 #update webpage
 @app.route('/update',methods = ['POST'])
 def update():
-       user = request.form['ustate']
+       user = request.form['uzipcode']
        user2 = request.form['upop']
-       return redirect(url_for('updatestatepop', updateSTATE=user, updatePOP=user2))
+       return redirect(url_for('updatezipcodepop', updateZIPCODE=user, updatePOP=user2))
 
 #search page
 @app.route('/search', methods=['GET'])
 def search():
-       user = request.args.get('sstate')
-       return redirect(url_for('searchstate', searchState=user))
+       user = request.args.get('szipcode')
+       return redirect(url_for('searchzipcode', searchZipcode=user))
 
 
 #root of web server and gots to template (login.html)
